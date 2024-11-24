@@ -58,11 +58,11 @@ const Game = () => {
     if (!gameStateRef.current.initialized) {
       // Define static positions for shields (e.g., in a row along the bottom)
       gameStateRef.current.shields = [
-        { x: 100, y: canvasHeight - 100, width: 50, height: 30 },
-        { x: 200, y: canvasHeight - 100, width: 50, height: 30 },
-        { x: 300, y: canvasHeight - 100, width: 50, height: 30 },
-        { x: 400, y: canvasHeight - 100, width: 50, height: 30 },
-        { x: 500, y: canvasHeight - 100, width: 50, height: 30 },
+        // { x: 100, y: canvasHeight - 100, width: 50, height: 30 },
+        // { x: 200, y: canvasHeight - 100, width: 50, height: 30 },
+        // { x: 300, y: canvasHeight - 100, width: 50, height: 30 },
+        // { x: 400, y: canvasHeight - 100, width: 50, height: 30 },
+        // { x: 500, y: canvasHeight - 100, width: 50, height: 30 },
       ];
       gameStateRef.current.initialized = true;
     }
@@ -70,7 +70,7 @@ const Game = () => {
 
   // Load images
   const background = new Image();
-  background.src = "/assets/background.png";
+  background.src = "/assets/background.jpg";
 
   const spaceshipImage = new Image();
   spaceshipImage.src = "/assets/ship.png";
