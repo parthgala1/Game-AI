@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+import json
 import torch
 import numpy as np
 from PIL import Image
@@ -8,10 +9,15 @@ import io
 import sys
 import os
 from pydantic import BaseModel
+import base64
 
 # Set up proper directory paths
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
+
+# Define output folder
+output_folder = os.path.join(current_dir, 'generated_levels')
+os.makedirs(output_folder, exist_ok=True)
 
 # Import from GAN.py
 from GAN import LevelGAN, render_layout, generate_layout, model
@@ -19,13 +25,14 @@ from GAN import LevelGAN, render_layout, generate_layout, model
 # Initialize FastAPI app
 app = FastAPI()
 
-# Add CORS middleware
+# Update CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["http://localhost:8000", "http://localhost:3000"],  # Specify exact origins
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 level_gan = LevelGAN()
@@ -45,7 +52,7 @@ async def generate_level(request: LevelRequest):
         # Generate pattern using LevelGAN
         pattern = level_gan.generate_level(request.difficulty, request.score, use_model='gan')
         
-        # Convert pattern to layout format
+        # Convert pattern to layout format and save layout data
         layout = []
         grid_rows = 25
         grid_cols = 25
@@ -60,46 +67,66 @@ async def generate_level(request: LevelRequest):
                 if pattern_2d[y, x] > 0.5:  # Threshold for platform placement
                     pos_x = x * box_size
                     pos_y = y * box_size
-                    if pos_y < (800 - 228):  # Respect safe zone
-                        layout.append({
-                            'x': int(pos_x),
-                            'y': int(pos_y),
-                            'type': 'solid'
-                        })
-        
-        # Create a BytesIO object to store the image
+                    layout.append({
+                        'x': int(pos_x),
+                        'y': int(pos_y),
+                        'type': 'solid'
+                    })
+
+        # Save layout data to file
+        layout_filename = f'level_d{request.difficulty:.3f}_s{request.score:.3f}.txt'
+        layout_txt_path = os.path.join(output_folder, layout_filename)
+        with open(layout_txt_path, 'w') as f:
+            json.dump(layout, f, indent=2)
+
+        # Create image buffer
         img_byte_arr = io.BytesIO()
         
-        # Render the layout
+        # Initialize background and box images
         bg = Image.open(os.path.join(current_dir, 'assets/space_background.png')).convert('RGBA')
         bg = bg.resize((800, 800))
         
         box = Image.open(os.path.join(current_dir, 'assets/box_template.png')).convert("RGBA")
         box = box.resize((32, 32))
         
-        # Place boxes according to layout with pattern consideration
+        # Place boxes according to layout
         for block in layout:
             pos_x = block['x']
             pos_y = block['y']
-            # Create platform groups based on pattern
-            if pos_x < 768 and pos_y < (800 - 228):
-                bg.paste(box, (pos_x, pos_y), box)
+            bg.paste(box, (pos_x, pos_y), box)
+            
+            # Add connecting platforms based on difficulty
+            if request.difficulty > 0.5:
+                # Add vertical connections
+                if any(b['x'] == pos_x and abs(b['y'] - pos_y) == box_size for b in layout):
+                    bg.paste(box, (pos_x, pos_y + box_size), box)
                 
-                # Add connecting platforms based on difficulty
-                if request.difficulty > 0.5:
-                    # Add vertical connections
-                    if any(b['x'] == pos_x and abs(b['y'] - pos_y) == box_size for b in layout):
-                        bg.paste(box, (pos_x, pos_y + box_size), box)
-                    
-                    # Add horizontal connections
-                    if any(b['y'] == pos_y and abs(b['x'] - pos_x) == box_size for b in layout):
-                        bg.paste(box, (pos_x + box_size, pos_y), box)
-        
-        # Save the final image to BytesIO
+                # Add horizontal connections
+                if any(b['y'] == pos_y and abs(b['x'] - pos_x) == box_size for b in layout):
+                    bg.paste(box, (pos_x + box_size, pos_y), box)
+
+        # Save the final image to BytesIO and local file
         bg.save(img_byte_arr, format='PNG')
         img_byte_arr.seek(0)
         
-        return StreamingResponse(img_byte_arr, media_type="image/png")
+        # Save image to local file
+        image_filename = f'level_d{request.difficulty:.3f}_s{request.score:.3f}.png'
+        image_path = os.path.join(output_folder, image_filename)
+        bg.save(image_path, format='PNG')
+        
+        # Read the layout data
+        with open(layout_txt_path, 'r') as f:
+            layout_data = json.load(f)
+        
+        # Return both image and layout data in the response
+        response = {
+            "layout": layout_data,
+            "layout_path": layout_txt_path,
+            "image_path": image_path,
+            "image": base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
+        }
+        
+        return JSONResponse(content=response)
     
     except Exception as e:
         print(f"Error generating level: {str(e)}")

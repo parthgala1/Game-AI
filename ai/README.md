@@ -94,3 +94,32 @@ Generate a new game level based on difficulty and score parameters.
   "score": 0.5 // Float between 0 and 1
 }
 ```
+
+#### Response
+- Content-Type: `image/png`
+- Headers:
+  - `X-Layout-Path`: Path to the layout data file
+- Returns: PNG image of the generated level (800x800 pixels)
+
+### JavaScript/Fetch Example with Layout Path
+```javascript
+fetch('http://localhost:5000/generate-level', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        difficulty: 0.7,
+        score: 0.5
+    })
+})
+.then(response => {
+    const layoutPath = response.headers.get('X-Layout-Path');
+    console.log('Layout data saved at:', layoutPath);
+    return response.blob();
+})
+.then(blob => {
+    const url = URL.createObjectURL(blob);
+    // Use the image URL as needed
+});
+```

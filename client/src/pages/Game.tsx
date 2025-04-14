@@ -13,10 +13,12 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
+  const [userScore, setUserScore] = useState(0);
   const [settings, setSettings] = useState({
     soundEnabled: true,
     difficulty: "medium",
     particleEffects: true,
+    userScore: 0,
   });
 
   // Extract level from URL query parameters
@@ -61,6 +63,14 @@ const Game = () => {
     setGameOver(false);
   };
 
+  const handleDifficultyChange = (difficulty: string) => {
+    setSettings(prev => ({ ...prev, difficulty }));
+  };
+
+  const handleScoreChange = (score: number) => {
+    setSettings(prev => ({ ...prev, userScore: score }));
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -74,6 +84,29 @@ const Game = () => {
               <h2 className="text-xl font-future text-white mb-4">
                 Level {currentLevel} Briefing
               </h2>
+
+              {/* Add difficulty and score inputs */}
+              <div className="flex justify-center gap-4 mb-6">
+                <select
+                  value={settings.difficulty}
+                  onChange={(e) => handleDifficultyChange(e.target.value)}
+                  className="bg-space-dark text-white px-4 py-2 rounded border border-space-neon-blue/30"
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+                <input
+                  type="number"
+                  value={settings.userScore}
+                  onChange={(e) => handleScoreChange(Number(e.target.value))}
+                  placeholder="Enter Score (0-100)"
+                  min="0"
+                  max="100"
+                  className="bg-space-dark text-white px-4 py-2 w-32 rounded border border-space-neon-pink/30"
+                />
+              </div>
+
               <p className="text-gray-300 mb-4">
                 {currentLevel === 1
                   ? "Welcome to your first mission! Alien invaders are approaching Earth, and you're our last line of defense. Use your ship to eliminate the threat before they reach our planet."

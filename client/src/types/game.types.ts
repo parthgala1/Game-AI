@@ -6,6 +6,7 @@ export interface GameProps {
     soundEnabled: boolean;
     difficulty: string;
     particleEffects: boolean;
+    userScore: number; // Add this new property
   };
 }
 
@@ -39,6 +40,7 @@ export interface Player {
   width: number;
   height: number;
   speed: number;
+  moveDirection: number;
 }
 
 export interface Explosion {

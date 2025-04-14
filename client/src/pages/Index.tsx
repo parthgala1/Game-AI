@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Gamepad, Zap, Layers, Settings } from "lucide-react";
 import Layout from "../components/Layout";
 import NeonButton from "../components/NeonButton";
+import game_preview from "../assets/game_preview.png";
 
 const Index = () => {
   return (
@@ -48,9 +49,13 @@ const Index = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mb-20"
         >
-          <div className="relative mx-auto game-container overflow-hidden">
+          <div className="relative w-[800px] h-[800px] mx-auto game-container overflow-hidden">
             <div className="absolute inset-0 bg-space-dark flex items-center justify-center">
-              <div className="text-white text-xl font-pixel">Game Preview</div>
+              <img
+                src={game_preview}
+                alt="Game Screenshot"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </motion.div>
