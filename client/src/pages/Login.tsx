@@ -15,10 +15,10 @@ const LoginPage = () => {
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  const userId = JSON.parse(localStorage.getItem("userData"));
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
-    if (userId.userName) {
+    if (userData?.userId) {
       navigate("/");
     }
   }, []);

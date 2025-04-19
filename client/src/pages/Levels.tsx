@@ -11,10 +11,10 @@ const Levels = () => {
   const [selectedCategory, setSelectedCategory] = useState<
     "all" | "standard" | "generated"
   >("all");
-  const userId = JSON.parse(localStorage.getItem("userData"));
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
-    if (!userId.userName) {
+    if (!userData?.userId) {
       navigate("/");
     }
   }, []);

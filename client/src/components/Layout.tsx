@@ -28,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             <nav className="hidden md:flex gap-8">
               <NavLink to="/" icon={<Home size={18} />} label="Home" />
-              {userData.userName && (
+              {userData?.userId && (
                 <>
                   <NavLink
                     to="/game"
@@ -47,7 +47,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   />
                 </>
               )}
-              {!userData.userName ? (
+              {!userData?.userId ? (
                 <NavLink to="/login" icon={<User size={18} />} label="Login" />
               ) : (
                 <div className="relative group">

@@ -20,10 +20,10 @@ const Game = () => {
     particleEffects: true,
     userScore: 0,
   });
-  const userId = JSON.parse(localStorage.getItem("userData"));
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
-    if (!userId.userName) {
+    if (!userData.userId) {
       navigate("/login");
     }
   }, []);

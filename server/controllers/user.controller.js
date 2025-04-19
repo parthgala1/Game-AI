@@ -61,6 +61,7 @@ export const createUser = async (req, res) => {
         await newUser.save();
 
         const userData = {
+            userId: newUser._id,
             userName: newUser.userName,
             profileImageUrl: newUser.profileImageUrl,
             fullName: newUser.fullName
@@ -97,6 +98,7 @@ export const loginUser = async (req, res) => {
         }
 
         const userData = {
+            userId: existingUser._id,
             userName: existingUser.userName,
             profileImageUrl: existingUser.profileImageUrl,
             fullName: existingUser.fullName

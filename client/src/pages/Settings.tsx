@@ -8,13 +8,14 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "../hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { NODE_SERVER_URL } from "@/constants/utils";
 
 const Settings = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState({
-    masterVolume: 80,
-    sfxVolume: 90,
-    musicVolume: 70,
+    masterVolume: 50,
+    sfxVolume: 50,
+    musicVolume: 50,
     soundEnabled: true,
     difficulty: "medium",
     particleEffects: true,
@@ -23,45 +24,99 @@ const Settings = () => {
     pixelatedRendering: true,
     showFPS: false,
   });
+  console.log(settings);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const userId = JSON.parse(localStorage.getItem("userData"));
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
-    if (!userId.userName) {
+    if (!userData.userId) {
       navigate("/");
+    } else {
+      fetchSettings();
     }
   }, []);
 
-  const handleSaveSettings = () => {
-    toast({
-      title: "Settings Saved",
-      description: "Your game preferences have been updated.",
-      duration: 3000,
-    });
+  const fetchSettings = async () => {
+    try {
+      setLoading(true);
+      const userId = userData.userId;
 
-    // For demo, we'll just log the settings
-    console.log("Saved settings:", settings);
+      const response = await fetch(
+        `${NODE_SERVER_URL}/api/settings/get-user-settings/${userId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const data = await response.json();
+
+      setSettings(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load settings",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleResetDefaults = () => {
-    setSettings({
-      masterVolume: 80,
-      sfxVolume: 90,
-      musicVolume: 70,
-      soundEnabled: true,
-      difficulty: "medium",
-      particleEffects: true,
-      screenShake: true,
-      highContrast: false,
-      pixelatedRendering: true,
-      showFPS: false,
-    });
+  const handleSaveSettings = async () => {
+    try {
+      const settingsData = { userId: userData.userId, updates: settings };
 
-    toast({
-      title: "Settings Reset",
-      description: "All settings have been restored to defaults.",
-      duration: 3000,
-    });
+      await fetch(`${NODE_SERVER_URL}/api/settings/save-user-settings`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(settingsData),
+      });
+
+      toast({
+        title: "Settings Saved",
+        description: "Your game preferences have been updated.",
+        duration: 3000,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResetDefaults = async () => {
+    try {
+      const response = await fetch(
+        `${NODE_SERVER_URL}/api/settings/reset-settings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: userData.userId }),
+        }
+      );
+
+      const data = await response.json();
+
+      setSettings(data.settings);
+      toast({
+        title: "Settings Reset",
+        description: "All settings have been restored to defaults.",
+        duration: 3000,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to reset settings",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

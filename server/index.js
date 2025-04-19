@@ -8,6 +8,7 @@ import cloudinary from "cloudinary";
 
 // Custom Routes
 import userRoutes from "./routes/user.route.js";
+import settingsRoutes from "./routes/settings.route.js";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.get("/", (req, res) => {
     res.send("Connected to MongoDB!");
 });
 app.use("/api/user", userRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // Initialize socket logic
 // socketHandler(server);
