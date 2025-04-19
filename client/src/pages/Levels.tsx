@@ -1,16 +1,24 @@
-
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import Layout from '../components/Layout';
-import LevelCard from '../components/LevelCard';
-import NeonButton from '../components/NeonButton';
-import { Gamepad, RefreshCw } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import Layout from "../components/Layout";
+import LevelCard from "../components/LevelCard";
+import NeonButton from "../components/NeonButton";
+import { Gamepad, RefreshCw } from "lucide-react";
 
 const Levels = () => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'standard' | 'generated'>('all');
-  
+  const [selectedCategory, setSelectedCategory] = useState<
+    "all" | "standard" | "generated"
+  >("all");
+  const userId = JSON.parse(localStorage.getItem("userData"));
+
+  useEffect(() => {
+    if (!userId.userName) {
+      navigate("/");
+    }
+  }, []);
+
   // Mock level data - in a real app, this would come from a database
   const levels = [
     {
@@ -21,7 +29,7 @@ const Levels = () => {
       isLocked: false,
       isCompleted: true,
       highScore: 1250,
-      category: "standard"
+      category: "standard",
     },
     {
       id: 2,
@@ -31,7 +39,7 @@ const Levels = () => {
       isLocked: false,
       isCompleted: false,
       highScore: 0,
-      category: "standard"
+      category: "standard",
     },
     {
       id: 3,
@@ -41,7 +49,7 @@ const Levels = () => {
       isLocked: true,
       isCompleted: false,
       highScore: 0,
-      category: "standard"
+      category: "standard",
     },
     {
       id: 4,
@@ -51,7 +59,7 @@ const Levels = () => {
       isLocked: true,
       isCompleted: false,
       highScore: 0,
-      category: "standard"
+      category: "standard",
     },
     {
       id: 5,
@@ -61,7 +69,7 @@ const Levels = () => {
       isLocked: true,
       isCompleted: false,
       highScore: 0,
-      category: "standard"
+      category: "standard",
     },
     {
       id: 101,
@@ -71,7 +79,7 @@ const Levels = () => {
       isLocked: false,
       isCompleted: false,
       highScore: 850,
-      category: "generated"
+      category: "generated",
     },
     {
       id: 102,
@@ -81,30 +89,30 @@ const Levels = () => {
       isLocked: false,
       isCompleted: false,
       highScore: 0,
-      category: "generated"
-    }
+      category: "generated",
+    },
   ];
 
-  const handleLevelSelect = (level: { 
-    id: number,
-    level: string | number, 
-    isLocked: boolean 
+  const handleLevelSelect = (level: {
+    id: number;
+    level: string | number;
+    isLocked: boolean;
   }) => {
     if (level.isLocked) return;
-    
+
     // Always use the numeric id for navigation
     navigate(`/game?level=${level.id}`);
   };
 
-  const filteredLevels = levels.filter(level => {
-    if (selectedCategory === 'all') return true;
+  const filteredLevels = levels.filter((level) => {
+    if (selectedCategory === "all") return true;
     return level.category === selectedCategory;
   });
 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -114,50 +122,53 @@ const Levels = () => {
             SELECT LEVEL
           </h1>
           <p className="text-white/80 max-w-2xl mx-auto mb-8">
-            Choose from standard campaign levels or try our AI-generated levels for a unique challenge.
+            Choose from standard campaign levels or try our AI-generated levels
+            for a unique challenge.
           </p>
-          
+
           <div className="flex justify-center gap-4 mb-8">
             <button
               className={`px-4 py-2 rounded-md font-future transition-all ${
-                selectedCategory === 'all' 
-                  ? 'bg-space-neon-green/20 text-space-neon-green border border-space-neon-green/50' 
-                  : 'bg-space-medium/30 text-gray-400 hover:text-white'
+                selectedCategory === "all"
+                  ? "bg-space-neon-green/20 text-space-neon-green border border-space-neon-green/50"
+                  : "bg-space-medium/30 text-gray-400 hover:text-white"
               }`}
-              onClick={() => setSelectedCategory('all')}
+              onClick={() => setSelectedCategory("all")}
             >
               All Levels
             </button>
             <button
               className={`px-4 py-2 rounded-md font-future transition-all ${
-                selectedCategory === 'standard' 
-                  ? 'bg-space-neon-blue/20 text-space-neon-blue border border-space-neon-blue/50' 
-                  : 'bg-space-medium/30 text-gray-400 hover:text-white'
+                selectedCategory === "standard"
+                  ? "bg-space-neon-blue/20 text-space-neon-blue border border-space-neon-blue/50"
+                  : "bg-space-medium/30 text-gray-400 hover:text-white"
               }`}
-              onClick={() => setSelectedCategory('standard')}
+              onClick={() => setSelectedCategory("standard")}
             >
               Campaign
             </button>
             <button
               className={`px-4 py-2 rounded-md font-future transition-all ${
-                selectedCategory === 'generated' 
-                  ? 'bg-space-neon-pink/20 text-space-neon-pink border border-space-neon-pink/50' 
-                  : 'bg-space-medium/30 text-gray-400 hover:text-white'
+                selectedCategory === "generated"
+                  ? "bg-space-neon-pink/20 text-space-neon-pink border border-space-neon-pink/50"
+                  : "bg-space-medium/30 text-gray-400 hover:text-white"
               }`}
-              onClick={() => setSelectedCategory('generated')}
+              onClick={() => setSelectedCategory("generated")}
             >
               AI Generated
             </button>
           </div>
-          
-          {selectedCategory === 'generated' && (
+
+          {selectedCategory === "generated" && (
             <div className="mb-8">
-              <NeonButton 
-                color="pink" 
+              <NeonButton
+                color="pink"
                 icon={<RefreshCw size={18} />}
                 onClick={() => {
                   // In a real app, this would trigger the GAN to generate a new level
-                  alert("In a full implementation, this would generate a new level using the GAN!");
+                  alert(
+                    "In a full implementation, this would generate a new level using the GAN!"
+                  );
                 }}
               >
                 Generate New Level
@@ -168,8 +179,8 @@ const Levels = () => {
             </div>
           )}
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -188,16 +199,22 @@ const Levels = () => {
               />
             ))}
           </div>
-          
+
           {filteredLevels.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-xl text-gray-400">No levels available in this category.</p>
+              <p className="text-xl text-gray-400">
+                No levels available in this category.
+              </p>
             </div>
           )}
         </motion.div>
-        
+
         <div className="mt-10 text-center">
-          <NeonButton color="green" icon={<Gamepad size={18} />} onClick={() => navigate('/game')}>
+          <NeonButton
+            color="green"
+            icon={<Gamepad size={18} />}
+            onClick={() => navigate("/game")}
+          >
             Play Latest Level
           </NeonButton>
         </div>

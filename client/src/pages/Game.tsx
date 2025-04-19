@@ -20,6 +20,13 @@ const Game = () => {
     particleEffects: true,
     userScore: 0,
   });
+  const userId = JSON.parse(localStorage.getItem("userData"));
+
+  useEffect(() => {
+    if (!userId.userName) {
+      navigate("/login");
+    }
+  }, []);
 
   // Extract level from URL query parameters
   useEffect(() => {
@@ -64,11 +71,11 @@ const Game = () => {
   };
 
   const handleDifficultyChange = (difficulty: string) => {
-    setSettings(prev => ({ ...prev, difficulty }));
+    setSettings((prev) => ({ ...prev, difficulty }));
   };
 
   const handleScoreChange = (score: number) => {
-    setSettings(prev => ({ ...prev, userScore: score }));
+    setSettings((prev) => ({ ...prev, userScore: score }));
   };
 
   return (

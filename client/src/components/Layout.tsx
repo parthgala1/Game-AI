@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { Gamepad, Settings, Home, Layers } from "lucide-react";
+import { Gamepad, Settings, Home, Layers, User } from "lucide-react";
 import StarField from "./StarField";
 
 interface LayoutProps {
@@ -11,6 +11,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const isGamePage = location.pathname === "/game";
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,17 +28,38 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             <nav className="hidden md:flex gap-8">
               <NavLink to="/" icon={<Home size={18} />} label="Home" />
-              <NavLink to="/game" icon={<Gamepad size={18} />} label="Play" />
-              <NavLink
-                to="/levels"
-                icon={<Layers size={18} />}
-                label="Levels"
-              />
-              <NavLink
-                to="/settings"
-                icon={<Settings size={18} />}
-                label="Settings"
-              />
+              {userData.userName && (
+                <>
+                  <NavLink
+                    to="/game"
+                    icon={<Gamepad size={18} />}
+                    label="Play"
+                  />
+                  <NavLink
+                    to="/levels"
+                    icon={<Layers size={18} />}
+                    label="Levels"
+                  />
+                  <NavLink
+                    to="/settings"
+                    icon={<Settings size={18} />}
+                    label="Settings"
+                  />
+                </>
+              )}
+              {!userData.userName ? (
+                <NavLink to="/login" icon={<User size={18} />} label="Login" />
+              ) : (
+                <div className="relative group">
+                  <img
+                    src={userData.profileImageUrl}
+                    className="h-10 w-10 rounded-full border-2 border-space-neon-green/50 object-cover transition-all duration-300 group-hover:border-space-neon-green group-hover:shadow-neon"
+                    alt="Profile"
+                  />
+                  <div className="absolute inset-0 rounded-full bg-space-neon-green/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute -inset-1 rounded-full bg-space-neon-green/20 blur-md opacity-0 group-hover:opacity-40 transition-opacity duration-300" />
+                </div>
+              )}
             </nav>
 
             <div className="flex md:hidden">

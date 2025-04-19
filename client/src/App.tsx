@@ -9,6 +9,8 @@ import Game from "./pages/Game";
 import Levels from "./pages/Levels";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import LoginPage from "./pages/Login";
+import RegisterPage from "./pages/Register";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ const App = () => {
             <Route path="/game" element={<Game />} />
             <Route path="/levels" element={<Levels />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
